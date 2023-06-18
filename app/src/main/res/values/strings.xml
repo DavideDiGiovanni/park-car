@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Park Car</string>
+    <string name="tab_map">Mappa</string>
+    <string name="tab_parking_list">Elenco Parcheggi</string>
 </resources>
