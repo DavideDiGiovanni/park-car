@@ -28,13 +28,13 @@ class MainActivity : AppCompatActivity() {
                 0 -> {
                     tab.text = getString(R.string.tab_map)
                     tab.customView = null
-                    tab.view.setBackgroundResource(R.color.Black)
+                    tab.view.setBackgroundResource(R.color.MapBackground)
 
                 }
                 1 -> {
                     tab.text = getString(R.string.tab_parking_list)
                     tab.customView = null
-                    tab.view.setBackgroundResource(R.color.White)
+                    tab.view.setBackgroundResource(R.color.ParkListBackground)
                 }
             }
         }.attach()
