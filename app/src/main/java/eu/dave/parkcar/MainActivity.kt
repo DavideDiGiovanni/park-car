@@ -2,44 +2,57 @@ package eu.dave.parkcar
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabLayout: TabLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Trova i bottoni nel layout dell'Activity
-        val mapButton = findViewById<Button>(R.id.mapButton)
-        val parkingListButton = findViewById<Button>(R.id.parkingListButton)
+        viewPager = findViewById(R.id.viewPager)
+        tabLayout = findViewById(R.id.tabLayout)
 
-        // Imposta il listener per il pulsante della mappa
-        mapButton.setOnClickListener {
-            showMapFragment()
+        val fragmentAdapter = ViewPagerAdapter(this)
+        viewPager.adapter = fragmentAdapter
+
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            when (position) {
+                0 -> {
+                    tab.text = getString(R.string.tab_map)
+                    tab.customView = null
+                    tab.view.setBackgroundResource(R.color.Black)
+
+                }
+                1 -> {
+                    tab.text = getString(R.string.tab_parking_list)
+                    tab.customView = null
+                    tab.view.setBackgroundResource(R.color.White)
+                }
+            }
+        }.attach()
+    }
+
+    private inner class ViewPagerAdapter(activity: AppCompatActivity) :
+        FragmentStateAdapter(activity) {
+
+        override fun getItemCount(): Int {
+            return 2
         }
 
-        // Imposta il listener per il pulsante dell'elenco dei parcheggi
-        parkingListButton.setOnClickListener {
-            showParkingListFragment()
+        override fun createFragment(position: Int): Fragment {
+            return when (position) {
+                0 -> MapFragment()
+                1 -> ParkingListFragment()
+                else -> throw IllegalArgumentException("Invalid position: $position")
+            }
         }
-
-        // Mostra inizialmente il Fragment della mappa
-        showMapFragment()
     }
-
-    private fun showMapFragment() {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-        val mapFragment = MapFragment()
-        fragmentTransaction.replace(R.id.fragmentContainer, mapFragment)
-        fragmentTransaction.commit()
-    }
-
-    private fun showParkingListFragment() {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-        val parkingListFragment = ParkingListFragment()
-        fragmentTransaction.replace(R.id.fragmentContainer, parkingListFragment)
-        fragmentTransaction.commit()
-    }
-
-
 }

@@ -12,12 +12,10 @@ class ParkingListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflating the layout for this fragment
         return inflater.inflate(R.layout.fragment_parking_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Perform any additional setup or UI interactions for the parking list fragment
     }
 }
