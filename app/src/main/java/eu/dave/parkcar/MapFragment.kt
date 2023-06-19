@@ -16,12 +16,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.util.Log
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var btnCenter: Button
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +38,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         btnCenter = rootView.findViewById(R.id.btnCenter)
         btnCenter.setOnClickListener { centerUserLocation() }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         return rootView
     }
 
@@ -43,13 +48,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            googleMap.isMyLocationEnabled = true
-            val userLocation = googleMap.myLocation
-            userLocation.let {
-                val latLng = LatLng(it.latitude, it.longitude)
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    val latLng = LatLng(it.latitude, it.longitude)
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                }
             }
         } else {
+            Log.d("MapFragment", "Location permission not granted")
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(ACCESS_FINE_LOCATION),
