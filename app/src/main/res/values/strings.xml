@@ -2,4 +2,5 @@
     <string name="app_name">Park Car</string>
     <string name="tab_map">Mappa</string>
     <string name="tab_parking_list">Elenco Parcheggi</string>
+    <string name="map_content_description">Mappa dei parcheggi</string>
 </resources>
