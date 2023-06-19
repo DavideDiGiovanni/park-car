@@ -19,6 +19,8 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -26,6 +28,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private lateinit var btnCenter: Button
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var userMarker: Marker? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,6 +56,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 location?.let {
                     val latLng = LatLng(it.latitude, it.longitude)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+
+                    // Crea il marker dell'utente solo se non esiste già
+                    if (userMarker == null) {
+                        userMarker = googleMap.addMarker(
+                            MarkerOptions()
+                                .position(latLng)
+                                .title("Posizione Utente")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        )
+                    } else {
+                        // Aggiorna la posizione del marker dell'utente
+                        userMarker?.position = latLng
+                    }
                 }
             }
         } else {
@@ -63,6 +80,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             )
         }
     }
+
 
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -98,6 +116,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
+        userMarker?.remove()
     }
 
     override fun onLowMemory() {
@@ -111,10 +130,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         googleMap.uiSettings.isZoomGesturesEnabled = true
 
         googleMap.uiSettings.isScrollGesturesEnabled = true
-
-        val parkingLocation = LatLng(41.9028, 12.4964)
-        googleMap.addMarker(MarkerOptions().position(parkingLocation).title("Parcheggio"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parkingLocation, 12f))
     }
 
     companion object {
