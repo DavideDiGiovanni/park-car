@@ -86,4 +86,28 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return parks
     }
 
+    fun getParkByName(name: String): Park? {
+        val db = readableDatabase
+        val cursor: Cursor? = db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $COLUMN_NAME = ?", arrayOf(name))
+        var park: Park? = null
+
+        cursor?.let {
+            val idIndex = cursor.getColumnIndex(COLUMN_ID)
+            val latitudeIndex = cursor.getColumnIndex(COLUMN_LATITUDE)
+            val longitudeIndex = cursor.getColumnIndex(COLUMN_LONGITUDE)
+
+            if (cursor.moveToFirst()) {
+                val id = cursor.getLong(idIndex)
+                val latitude = cursor.getDouble(latitudeIndex)
+                val longitude = cursor.getDouble(longitudeIndex)
+                park = Park(id, latitude, longitude, name)
+            }
+            cursor.close()
+        }
+
+        db.close()
+        return park
+    }
+
+
 }
