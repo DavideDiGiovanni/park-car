@@ -23,6 +23,13 @@ class MainActivity : AppCompatActivity() {
         val fragmentAdapter = ViewPagerAdapter(this)
         viewPager.adapter = fragmentAdapter
 
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewPager.isUserInputEnabled = position != 0
+            }
+        })
+
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
                 0 -> {
