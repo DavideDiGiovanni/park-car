@@ -16,7 +16,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.app.AlertDialog
 import android.util.Log
+import android.widget.EditText
+import android.widget.Toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -27,7 +30,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var btnCenter: Button
+    private lateinit var btnSave: Button
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var databaseHelper: DatabaseHelper
     private var userMarker: Marker? = null
 
 
@@ -41,8 +46,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         btnCenter = rootView.findViewById(R.id.btnCenter)
+        btnSave = rootView.findViewById(R.id.btnSaveMap)
         btnCenter.setOnClickListener { centerUserLocation() }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        databaseHelper = DatabaseHelper(requireContext())
         return rootView
     }
 
@@ -130,9 +137,67 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         googleMap.uiSettings.isZoomGesturesEnabled = true
 
         googleMap.uiSettings.isScrollGesturesEnabled = true
+
+        btnSave.setOnClickListener {
+            val latLng = googleMap.cameraPosition.target
+            savePark(latLng)
+        }
+
     }
 
     companion object {
         const val LOCATION_PERMISSION_REQUEST_CODE = 123
     }
+
+    private fun savePark(latLng: LatLng) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_save_parking, null)
+        val dialogBuilder = AlertDialog.Builder(requireContext()).setView(dialogView)
+        val alertDialog = dialogBuilder.create()
+
+        val etName = dialogView.findViewById<EditText>(R.id.etName)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnSaveMap)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+
+        btnSave.setOnClickListener {
+            val name = etName.text.toString().trim()
+
+            if (name.isNotEmpty()) {
+                val existingPark = databaseHelper.getParkByName(name)
+
+                if (existingPark != null) {
+                    // Mostra un messaggio di errore che il nome esiste già
+                    showMessage("Impossibile salvare, il nome è già presente")
+                } else {
+                    // Il nome non esiste, esegui il salvataggio del parcheggio
+                    val latitude = userMarker?.position?.latitude ?: 0.0
+                    val longitude = userMarker?.position?.longitude ?: 0.0
+                    val id = databaseHelper.insertPark(latitude, longitude, name)
+
+                    // Aggiungi un segnaposto adatto nel punto di salvataggio
+                    googleMap.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(name)
+                    )
+
+                    // Mostra un messaggio di successo
+                    showMessage("Parcheggio salvato con successo")
+                }
+            } else {
+                // Mostra un messaggio di errore se il nome è vuoto
+                showMessage("Inserisci un nome valido")
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
+    private fun showMessage(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
 }
