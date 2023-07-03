@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> MapFragment()
-                1 -> ParkingListFragment()
+                1 -> ParkListFragment()
                 else -> throw IllegalArgumentException("Invalid position: $position")
             }
         }
