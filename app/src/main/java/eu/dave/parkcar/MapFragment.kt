@@ -162,9 +162,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val name = etName.text.toString().trim()
 
             if (name.isNotEmpty()) {
-                val existingPark = databaseHelper.getParkByName(name)
-
-                if (existingPark != null) {
+                val existingParkByName = databaseHelper.getParkByName(name)
+                // TODO implementare existingParkByLatLong
+                if (existingParkByName != null) {
                     // Mostra un messaggio di errore che il nome esiste già
                     showMessage("Impossibile salvare, il nome è già presente")
                 } else {
