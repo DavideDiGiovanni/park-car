@@ -182,11 +182,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                     // Mostra un messaggio di successo
                     showMessage("Parcheggio salvato con successo")
+                    alertDialog.dismiss()
                 }
             } else {
                 // Mostra un messaggio di errore se il nome è vuoto
                 showMessage("Inserisci un nome valido")
             }
+
+
         }
 
         btnCancel.setOnClickListener {
