@@ -140,7 +140,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         btnSave.setOnClickListener {
             val latLng = googleMap.cameraPosition.target
-            savePark(latLng)
+            saveParking(latLng)
         }
 
     }
@@ -149,7 +149,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         const val LOCATION_PERMISSION_REQUEST_CODE = 123
     }
 
-    private fun savePark(latLng: LatLng) {
+    private fun saveParking(latLng: LatLng) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_save_parking, null)
         val dialogBuilder = AlertDialog.Builder(requireContext()).setView(dialogView)
         val alertDialog = dialogBuilder.create()
@@ -162,16 +162,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val name = etName.text.toString().trim()
 
             if (name.isNotEmpty()) {
-                val existingParkByName = databaseHelper.getParkByName(name)
-                // TODO implementare existingParkByLatLong
-                if (existingParkByName != null) {
+                val existingParkingByName = databaseHelper.getParkingByName(name)
+                // TODO implementare existingParkingByLatLong
+                if (existingParkingByName != null) {
                     // Mostra un messaggio di errore che il nome esiste già
                     showMessage("Impossibile salvare, il nome è già presente")
                 } else {
                     // Il nome non esiste, esegui il salvataggio del parcheggio
                     val latitude = userMarker?.position?.latitude ?: 0.0
                     val longitude = userMarker?.position?.longitude ?: 0.0
-                    val id = databaseHelper.insertPark(latitude, longitude, name)
+                    val id = databaseHelper.insertParking(latitude, longitude, name)
 
                     // Aggiungi un segnaposto adatto nel punto di salvataggio
                     googleMap.addMarker(

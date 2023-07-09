@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class ParkListFragment : Fragment() {
+class ParkingListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
-    private lateinit var parkListAdapter: ParkListAdapter
+    private lateinit var parkingListAdapter: ParkingListAdapter
     private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_park_list, container, false)
+        return inflater.inflate(R.layout.fragment_parking_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -23,17 +23,17 @@ class ParkListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         databaseHelper = DatabaseHelper(requireContext())
-        val parkList = databaseHelper.getAllParks()
+        val parkList = databaseHelper.getAllParkings()
 
-        parkListAdapter = ParkListAdapter(parkList) { clickedPark ->
+        parkingListAdapter = ParkingListAdapter(parkList) { clickedParking ->
             // TODO implementare l'evento cliccabile
         }
-        recyclerView.adapter = parkListAdapter
+        recyclerView.adapter = parkingListAdapter
     }
 
     fun refreshList() {
-        val updatedParkingList = databaseHelper.getAllParks()
-        parkListAdapter.updateList(updatedParkingList)
+        val updatedParkingList = databaseHelper.getAllParkings()
+        parkingListAdapter.updateList(updatedParkingList)
     }
 }
 

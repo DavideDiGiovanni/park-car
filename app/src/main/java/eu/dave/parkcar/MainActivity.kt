@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                 1 -> {
                     tab.text = getString(R.string.tab_parking_list)
                     tab.customView = null
-                    tab.view.setBackgroundResource(R.color.ParkListBackground)
+                    tab.view.setBackgroundResource(R.color.ParkingListBackground)
                 }
             }
         }.attach()
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> MapFragment()
-                1 -> ParkListFragment()
+                1 -> ParkingListFragment()
                 else -> throw IllegalArgumentException("Invalid position: $position")
             }
         }

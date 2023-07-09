@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "parks.db"
+        private const val DATABASE_NAME = "parkings.db"
         private const val DATABASE_VERSION = 1
-        private const val TABLE_NAME = "parks"
+        private const val TABLE_NAME = "parkings"
         private const val COLUMN_ID = "id"
         private const val COLUMN_LATITUDE = "latitude"
         private const val COLUMN_LONGITUDE = "longitude"
@@ -29,7 +29,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
     
-    fun insertPark(latitude: Double, longitude: Double, name: String): Long {
+    fun insertParking(latitude: Double, longitude: Double, name: String): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_LATITUDE, latitude)
@@ -41,7 +41,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return id
     }
 
-    fun updatePark(id: Long, latitude: Double, longitude: Double, name: String): Int {
+    fun updateParking(id: Long, latitude: Double, longitude: Double, name: String): Int {
         val db = writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_LATITUDE, latitude)
@@ -53,15 +53,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return updatedRows
     }
 
-    fun deletePark(id: Long): Int {
+    fun deleteParking(id: Long): Int {
         val db = writableDatabase
         val deletedRows = db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id.toString()))
         db.close()
         return deletedRows
     }
 
-    fun getAllParks(): List<Park> {
-        val parks = mutableListOf<Park>()
+    fun getAllParkings(): List<Parking> {
+        val parkings = mutableListOf<Parking>()
         val db = readableDatabase
         val columns = arrayOf(COLUMN_ID, COLUMN_LATITUDE, COLUMN_LONGITUDE, COLUMN_NAME)
         val cursor: Cursor? = db.query(TABLE_NAME, columns, null, null, null, null, null)
@@ -77,19 +77,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val latitude = if (latitudeIndex != -1) cursor.getDouble(latitudeIndex) else 0.0
                 val longitude = if (longitudeIndex != -1) cursor.getDouble(longitudeIndex) else 0.0
                 val name = if (nameIndex != -1) cursor.getString(nameIndex) else ""
-                val park = Park(id, latitude, longitude, name)
-                parks.add(park)
+                val parking = Parking(id, latitude, longitude, name)
+                parkings.add(parking)
             }
         }
 
         db.close()
-        return parks
+        return parkings
     }
 
-    fun getParkByName(name: String): Park? {
+    fun getParkingByName(name: String): Parking? {
         val db = readableDatabase
         val cursor: Cursor? = db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $COLUMN_NAME = ?", arrayOf(name))
-        var park: Park? = null
+        var parking: Parking? = null
 
         cursor?.let {
             val idIndex = cursor.getColumnIndex(COLUMN_ID)
@@ -100,13 +100,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val id = cursor.getLong(idIndex)
                 val latitude = cursor.getDouble(latitudeIndex)
                 val longitude = cursor.getDouble(longitudeIndex)
-                park = Park(id, latitude, longitude, name)
+                parking = Parking(id, latitude, longitude, name)
             }
             cursor.close()
         }
 
         db.close()
-        return park
+        return parking
     }
 
 
