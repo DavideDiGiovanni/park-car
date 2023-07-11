@@ -38,6 +38,11 @@ class ParkingListFragment : Fragment() {
         val updatedParkingList = databaseHelper.getAllParkings()
         parkingListAdapter.updateList(updatedParkingList)
     }
+
+    override fun onResume() {
+        super.onResume()
+        refreshList()
+    }
 }
 
 
