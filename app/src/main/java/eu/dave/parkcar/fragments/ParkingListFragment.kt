@@ -1,4 +1,4 @@
-package eu.dave.parkcar
+package eu.dave.parkcar.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import eu.dave.parkcar.repository.DatabaseHelper
+import eu.dave.parkcar.repository.ParkingListAdapter
+import eu.dave.parkcar.R
 
 class ParkingListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView

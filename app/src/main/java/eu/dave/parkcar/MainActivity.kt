@@ -7,6 +7,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import eu.dave.parkcar.fragments.MapFragment
+import eu.dave.parkcar.fragments.ParkingListFragment
 
 class MainActivity : AppCompatActivity() {
 

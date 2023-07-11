@@ -1,10 +1,12 @@
-package eu.dave.parkcar
+package eu.dave.parkcar.repository
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import eu.dave.parkcar.R
+import eu.dave.parkcar.entity.Parking
 
 class ParkingListAdapter(private var parkingList: List<Parking>, private val onItemClick: (Parking) -> Unit) : RecyclerView.Adapter<ParkingListAdapter.ParkingViewHolder>() {
 

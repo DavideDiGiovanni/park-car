@@ -1,4 +1,4 @@
-package eu.dave.parkcar
+package eu.dave.parkcar.fragments
 
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -24,6 +24,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
+import eu.dave.parkcar.repository.DatabaseHelper
+import eu.dave.parkcar.R
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
