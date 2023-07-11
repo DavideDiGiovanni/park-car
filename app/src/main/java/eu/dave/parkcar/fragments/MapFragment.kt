@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
@@ -33,6 +35,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private lateinit var btnCenter: Button
     private lateinit var btnSave: Button
+    private lateinit var btnShare: Button
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var databaseHelper: DatabaseHelper
     private var userMarker: Marker? = null
@@ -49,11 +52,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
         btnCenter = rootView.findViewById(R.id.btnCenter)
         btnSave = rootView.findViewById(R.id.btnSaveMap)
+        btnShare = rootView.findViewById(R.id.btnShare)
         btnCenter.setOnClickListener { centerUserLocation() }
+        btnShare.setOnClickListener {
+            shareLocation()
+        }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         databaseHelper = DatabaseHelper(requireContext())
         return rootView
     }
+
+    private fun shareLocation() {
+        val latitude = userMarker?.position?.latitude ?: 0.0
+        val longitude = userMarker?.position?.longitude ?: 0.0
+
+        val shareText = "La posizione del parcheggio: https://www.google.com/maps?q=$latitude,$longitude"
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+
+        val chooserIntent = Intent.createChooser(sendIntent, "Condividi la posizione")
+
+        try {
+            startActivity(chooserIntent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), "Nessuna app disponibile per la condivisione", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 
     private fun centerUserLocation() {
         if (ContextCompat.checkSelfPermission(
