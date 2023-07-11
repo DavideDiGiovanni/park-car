@@ -1,33 +1,33 @@
 package eu.dave.parkcar.fragments
 
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import eu.dave.parkcar.repository.DatabaseHelper
+import com.google.android.gms.maps.model.MarkerOptions
 import eu.dave.parkcar.R
+import eu.dave.parkcar.repository.DatabaseHelper
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -39,7 +39,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var databaseHelper: DatabaseHelper
     private var userMarker: Marker? = null
-
+    private var selectedLatLng: LatLng? = null
+    private var marker: Marker? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,36 +55,39 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         btnSave = rootView.findViewById(R.id.btnSaveMap)
         btnShare = rootView.findViewById(R.id.btnShare)
         btnCenter.setOnClickListener { centerUserLocation() }
-        btnShare.setOnClickListener {
-            shareLocation()
-        }
+        btnShare.setOnClickListener { shareLocation() }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         databaseHelper = DatabaseHelper(requireContext())
         return rootView
     }
 
     private fun shareLocation() {
-        val latitude = userMarker?.position?.latitude ?: 0.0
-        val longitude = userMarker?.position?.longitude ?: 0.0
+        selectedLatLng?.let { latLng ->
+            val shareText = "La posizione selezionata: ${latLng.latitude}, ${latLng.longitude}"
 
-        val shareText = "La posizione del parcheggio: https://www.google.com/maps?q=$latitude,$longitude"
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, shareText)
+                type = "text/plain"
+            }
 
-        val sendIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, shareText)
-            type = "text/plain"
-        }
+            val chooserIntent = Intent.createChooser(sendIntent, "Condividi la posizione")
 
-        val chooserIntent = Intent.createChooser(sendIntent, "Condividi la posizione")
-
-        try {
-            startActivity(chooserIntent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(requireContext(), "Nessuna app disponibile per la condivisione", Toast.LENGTH_SHORT).show()
-        }
+            try {
+                startActivity(chooserIntent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(
+                    requireContext(),
+                    "Nessuna app disponibile per la condivisione",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } ?: Toast.makeText(
+            requireContext(),
+            "Seleziona una posizione sulla mappa",
+            Toast.LENGTH_SHORT
+        ).show()
     }
-
-
 
     private fun centerUserLocation() {
         if (ContextCompat.checkSelfPermission(
@@ -120,6 +124,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun showMarker() {
+        selectedLatLng?.let { latLng ->
+            if (marker == null) {
+                marker = googleMap.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title("Posizione selezionata")
+                )
+            } else {
+                marker?.position = latLng
+            }
+        }
+    }
 
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -134,7 +151,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             )
         }
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -167,14 +183,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         googleMap = map
 
         googleMap.uiSettings.isZoomGesturesEnabled = true
-
         googleMap.uiSettings.isScrollGesturesEnabled = true
 
-        btnSave.setOnClickListener {
-            val latLng = googleMap.cameraPosition.target
-            saveParking(latLng)
+        googleMap.setOnMapClickListener { latLng ->
+            selectedLatLng = latLng
+            showMarker()
         }
 
+        btnSave.setOnClickListener {
+            saveParking(googleMap.cameraPosition.target)
+        }
     }
 
     companion object {
@@ -182,7 +200,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun saveParking(latLng: LatLng) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_save_parking, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_save_parking, null)
         val dialogBuilder = AlertDialog.Builder(requireContext()).setView(dialogView)
         val alertDialog = dialogBuilder.create()
 
@@ -193,35 +212,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         btnSave.setOnClickListener {
             val name = etName.text.toString().trim()
 
-            if (name.isNotEmpty()) {
+            if (name.isNotEmpty() && selectedLatLng != null) {
                 val existingParkingByName = databaseHelper.getParkingByName(name)
-                // TODO implementare existingParkingByLatLong
+                // TODO implement existingParkingByLatLong
                 if (existingParkingByName != null) {
-                    // Mostra un messaggio di errore che il nome esiste già
+                    // Show an error message that the name already exists
                     showMessage("Impossibile salvare, il nome è già presente")
                 } else {
-                    // Il nome non esiste, esegui il salvataggio del parcheggio
-                    val latitude = userMarker?.position?.latitude ?: 0.0
-                    val longitude = userMarker?.position?.longitude ?: 0.0
+                    // The name does not exist, perform the parking save
+                    val latitude = selectedLatLng?.latitude ?: 0.0
+                    val longitude = selectedLatLng?.longitude ?: 0.0
                     val id = databaseHelper.insertParking(latitude, longitude, name)
 
-                    // Aggiungi un segnaposto adatto nel punto di salvataggio
+                    // Add a suitable marker at the save point
                     googleMap.addMarker(
                         MarkerOptions()
-                            .position(latLng)
+                            .position(selectedLatLng!!)
                             .title(name)
                     )
 
-                    // Mostra un messaggio di successo
+                    // Show a success message
                     showMessage("Parcheggio salvato con successo")
                     alertDialog.dismiss()
                 }
             } else {
-                // Mostra un messaggio di errore se il nome è vuoto
-                showMessage("Inserisci un nome valido")
+                // Show an error message if name or selectedLatLng is empty
+                showMessage("Inserisci un nome valido e seleziona una posizione sulla mappa")
             }
-
-
         }
 
         btnCancel.setOnClickListener {
