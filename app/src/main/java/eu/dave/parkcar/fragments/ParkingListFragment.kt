@@ -1,13 +1,15 @@
 package eu.dave.parkcar.fragments
 
-import android.app.AlertDialog
 import android.app.Dialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,15 +46,20 @@ class ParkingListFragment : Fragment() {
         dialog.setContentView(R.layout.dialog_parking_list)
 
         // Recupera i riferimenti agli elementi del layout
-        val btnShareParkingList = dialog.findViewById<Button>(R.id.btnShareParkingList)
-        val btnShareCenterParkingList = dialog.findViewById<Button>(R.id.btnShareCenterParkingList)
-        val btnCancelParkingList = dialog.findViewById<Button>(R.id.btnCancelParkingList)
+        val btnShare = dialog.findViewById<Button>(R.id.btnShareParkingList)
+        val btnCenter = dialog.findViewById<Button>(R.id.btnCenterParkingList)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancelParkingList)
         val txtParkingDetails = dialog.findViewById<TextView>(R.id.txtParkingDetails)
 
         // Imposta il testo del TextView con i dettagli del parcheggio
         txtParkingDetails.text = "Nome: ${parking.name}\nLatitudine: ${parking.latitude}\nLongitudine: ${parking.longitude}"
 
-        // Aggiungi i listener di clic ai pulsanti, se necessario
+        btnShare.setOnClickListener {shareLocation(parking)}
+        btnCancel.setOnClickListener {
+            databaseHelper.deleteParking(parking.id)
+            refreshList()
+            dialog.dismiss()
+        }
 
         dialog.show()
     }
@@ -66,6 +73,29 @@ class ParkingListFragment : Fragment() {
         super.onResume()
         refreshList()
     }
+
+    private fun shareLocation(parking: Parking) {
+        val shareText = "La posizione del parcheggio ${parking.name}: ${parking.latitude}, ${parking.longitude}"
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+
+        val chooserIntent = Intent.createChooser(sendIntent, "Condividi la posizione")
+
+        try {
+            startActivity(chooserIntent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(
+                requireContext(),
+                "Nessuna app disponibile per la condivisione",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
 }
 
 
