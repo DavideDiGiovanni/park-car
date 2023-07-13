@@ -98,7 +98,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
             )
         } else {
-            // Aggiorna la posizione del marker dell'utente
             userMarker?.position = latLng
         }
     }
@@ -114,7 +113,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     val latLng = LatLng(it.latitude, it.longitude)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
 
-                    // Crea il marker dell'utente solo se non esiste già
                     if (userMarker == null) {
                         userMarker = googleMap.addMarker(
                             MarkerOptions()
@@ -123,7 +121,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                         )
                     } else {
-                        // Aggiorna la posizione del marker dell'utente
                         userMarker?.position = latLng
                     }
                 }
@@ -230,27 +227,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val existingParkingByName = databaseHelper.getParkingByName(name)
                 // TODO implement existingParkingByLatLong
                 if (existingParkingByName != null) {
-                    // Show an error message that the name already exists
                     showMessage("Impossibile salvare, il nome è già presente")
                 } else {
-                    // The name does not exist, perform the parking save
                     val latitude = selectedLatLng?.latitude ?: 0.0
                     val longitude = selectedLatLng?.longitude ?: 0.0
                     val id = databaseHelper.insertParking(latitude, longitude, name)
 
-                    // Add a suitable marker at the save point
                     googleMap.addMarker(
                         MarkerOptions()
                             .position(selectedLatLng!!)
                             .title(name)
                     )
 
-                    // Show a success message
                     showMessage("Parcheggio salvato con successo")
                     alertDialog.dismiss()
                 }
             } else {
-                // Show an error message if name or selectedLatLng is empty
                 showMessage("Inserisci un nome valido e seleziona una posizione sulla mappa")
             }
         }

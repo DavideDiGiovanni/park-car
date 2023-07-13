@@ -8,14 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import eu.dave.parkcar.R
 import eu.dave.parkcar.entity.Parking
 
-class ParkingListAdapter(private var parkingList: List<Parking>, private val onItemClick: (Parking) -> Unit) : RecyclerView.Adapter<ParkingListAdapter.ParkingViewHolder>() {
+class ParkingListAdapter(
+    private var parkingList: List<Parking>,
+    private val onItemClick: (Parking) -> Unit
+) : RecyclerView.Adapter<ParkingListAdapter.ParkingViewHolder>() {
 
     class ParkingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameTextView: TextView = itemView.findViewById(R.id.nameTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParkingViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.parking_item, parent, false)
+        val itemView =
+            LayoutInflater.from(parent.context).inflate(R.layout.parking_item, parent, false)
         return ParkingViewHolder(itemView)
     }
 

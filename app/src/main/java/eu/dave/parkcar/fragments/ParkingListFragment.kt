@@ -13,17 +13,21 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import eu.dave.parkcar.repository.DatabaseHelper
-import eu.dave.parkcar.repository.ParkingListAdapter
 import eu.dave.parkcar.R
 import eu.dave.parkcar.entity.Parking
+import eu.dave.parkcar.repository.DatabaseHelper
+import eu.dave.parkcar.repository.ParkingListAdapter
 
 class ParkingListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var parkingListAdapter: ParkingListAdapter
     private lateinit var databaseHelper: DatabaseHelper
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_parking_list, container, false)
     }
 
@@ -45,21 +49,21 @@ class ParkingListFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_parking_list)
 
-        // Recupera i riferimenti agli elementi del layout
         val btnShare = dialog.findViewById<Button>(R.id.btnShareParkingList)
         val btnCenter = dialog.findViewById<Button>(R.id.btnCenterParkingList)
         val btnCancel = dialog.findViewById<Button>(R.id.btnCancelParkingList)
         val txtParkingDetails = dialog.findViewById<TextView>(R.id.txtParkingDetails)
 
-        // Imposta il testo del TextView con i dettagli del parcheggio
-        txtParkingDetails.text = "Nome: ${parking.name}\nLatitudine: ${parking.latitude}\nLongitudine: ${parking.longitude}"
+        txtParkingDetails.text =
+            "Nome: ${parking.name}\nLatitudine: ${parking.latitude}\nLongitudine: ${parking.longitude}"
 
-        btnShare.setOnClickListener {shareLocation(parking)}
+        btnShare.setOnClickListener { shareLocation(parking) }
         btnCancel.setOnClickListener {
             databaseHelper.deleteParking(parking.id)
             refreshList()
             dialog.dismiss()
         }
+        // TODO implement btnCenter
 
         dialog.show()
     }
@@ -75,7 +79,8 @@ class ParkingListFragment : Fragment() {
     }
 
     private fun shareLocation(parking: Parking) {
-        val shareText = "La posizione del parcheggio ${parking.name}: ${parking.latitude}, ${parking.longitude}"
+        val shareText =
+            "La posizione del parcheggio ${parking.name}: ${parking.latitude}, ${parking.longitude}"
 
         val sendIntent = Intent().apply {
             action = Intent.ACTION_SEND

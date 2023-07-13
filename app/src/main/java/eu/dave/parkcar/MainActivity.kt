@@ -1,7 +1,7 @@
 package eu.dave.parkcar
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
                     tab.view.setBackgroundResource(R.color.MapBackground)
 
                 }
+
                 1 -> {
                     tab.text = getString(R.string.tab_parking_list)
                     tab.customView = null
