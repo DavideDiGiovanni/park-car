@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnShareParkingList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/btnShareCenterParkingList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/center"
+        style="?android:attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/btnCancelParkingList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancella"
+        style="?android:attr/buttonBarButtonStyle" />
+</LinearLayout>
+
