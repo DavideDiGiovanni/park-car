@@ -6,4 +6,8 @@
     <string name="save">Salva</string>
     <string name="center">Centra</string>
     <string name="share">Condividi</string>
+    <string name="cancella">Cancella</string>
+    <string name="salva">Salva</string>
+    <string name="nome">Nome</string>
+    <string name="inserisci_il_nome_del_parcheggio">Inserisci il nome del parcheggio:</string>
 </resources>

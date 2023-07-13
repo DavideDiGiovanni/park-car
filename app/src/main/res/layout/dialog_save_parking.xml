@@ -7,16 +7,18 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Inserisci il nome del parcheggio:"
+        android:text="@string/inserisci_il_nome_del_parcheggio"
         android:textSize="16sp" />
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome"
+        android:hint="@string/nome"
         android:inputType="text"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:minHeight="48dp"
+        android:importantForAutofill="no" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,13 +30,15 @@
             android:id="@+id/btnSaveMap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Salva" />
+            android:text="@string/salva"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancella" />
+            android:text="@string/cancella"
+            style="?android:attr/buttonBarButtonStyle" />
     </LinearLayout>
 
 </LinearLayout>
