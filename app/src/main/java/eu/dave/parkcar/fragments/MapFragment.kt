@@ -89,6 +89,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         ).show()
     }
 
+    fun centerExistingLocation(latLng: LatLng) {
+        if (userMarker == null) {
+            userMarker = googleMap.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+                    .title("Posizione Utente")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+            )
+        } else {
+            // Aggiorna la posizione del marker dell'utente
+            userMarker?.position = latLng
+        }
+    }
+
     private fun centerUserLocation() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
