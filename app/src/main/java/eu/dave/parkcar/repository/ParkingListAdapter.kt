@@ -20,11 +20,11 @@ class ParkingListAdapter(private var parkingList: List<Parking>, private val onI
     }
 
     override fun onBindViewHolder(holder: ParkingViewHolder, position: Int) {
-        val park = parkingList[position]
-        holder.nameTextView.text = park.name
+        val parking = parkingList[position]
+        holder.nameTextView.text = parking.name
 
         holder.itemView.setOnClickListener {
-            onItemClick(park)
+            onItemClick(parking)
         }
     }
 
