@@ -61,6 +61,49 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return rootView
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mapView.onResume()
+        requestLocationPermission()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView.onDestroy()
+        userMarker?.remove()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+
+        googleMap.uiSettings.isZoomGesturesEnabled = true
+        googleMap.uiSettings.isScrollGesturesEnabled = true
+
+        googleMap.setOnMapClickListener { latLng ->
+            selectedLatLng = latLng
+            showMarker()
+        }
+
+        btnSave.setOnClickListener {
+            saveParking(googleMap.cameraPosition.target)
+        }
+    }
+
     private fun shareLocation() {
         selectedLatLng?.let { latLng ->
             val shareText = "La posizione selezionata: ${latLng.latitude}, ${latLng.longitude}"
@@ -163,49 +206,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        mapView.onResume()
-        requestLocationPermission()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-        userMarker?.remove()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-
-        googleMap.uiSettings.isZoomGesturesEnabled = true
-        googleMap.uiSettings.isScrollGesturesEnabled = true
-
-        googleMap.setOnMapClickListener { latLng ->
-            selectedLatLng = latLng
-            showMarker()
-        }
-
-        btnSave.setOnClickListener {
-            saveParking(googleMap.cameraPosition.target)
-        }
-    }
-
     companion object {
         const val LOCATION_PERMISSION_REQUEST_CODE = 123
     }
@@ -216,42 +216,42 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val dialogBuilder = AlertDialog.Builder(requireContext()).setView(dialogView)
         val alertDialog = dialogBuilder.create()
 
-        val etName = dialogView.findViewById<EditText>(R.id.etName)
+        val parkingName = dialogView.findViewById<EditText>(R.id.etName).text.toString().trim()
         val btnSave = dialogView.findViewById<Button>(R.id.btnSaveMap)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
-        btnSave.setOnClickListener {
-            val name = etName.text.toString().trim()
-
-            if (name.isNotEmpty() && selectedLatLng != null) {
-                val existingParkingByName = databaseHelper.getParkingByName(name)
-                // TODO implement existingParkingByLatLong
-                if (existingParkingByName != null) {
-                    showMessage("Impossibile salvare, il nome è già presente")
-                } else {
-                    val latitude = selectedLatLng?.latitude ?: 0.0
-                    val longitude = selectedLatLng?.longitude ?: 0.0
-                    val id = databaseHelper.insertParking(latitude, longitude, name)
-
-                    googleMap.addMarker(
-                        MarkerOptions()
-                            .position(selectedLatLng!!)
-                            .title(name)
-                    )
-
-                    showMessage("Parcheggio salvato con successo")
-                    alertDialog.dismiss()
-                }
-            } else {
-                showMessage("Inserisci un nome valido e seleziona una posizione sulla mappa")
-            }
-        }
-
-        btnCancel.setOnClickListener {
-            alertDialog.dismiss()
-        }
+        btnSave.setOnClickListener { saveParkingListener(parkingName, alertDialog) }
+        btnCancel.setOnClickListener { alertDialog.dismiss() }
 
         alertDialog.show()
+    }
+
+    private fun saveParkingListener(parkingName: String, alertDialog: AlertDialog) {
+        if (parkingName.isNotEmpty() && selectedLatLng != null) {
+            val existingParkingByName = databaseHelper.getParkingByName(parkingName)
+            // TODO implement existingParkingByLatLong
+
+            if (existingParkingByName != null) {
+                showMessage("Impossibile salvare, il nome è già presente")
+
+            } else {
+                val latitude = selectedLatLng?.latitude ?: 0.0
+                val longitude = selectedLatLng?.longitude ?: 0.0
+                val id = databaseHelper.insertParking(latitude, longitude, parkingName)
+
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .position(selectedLatLng!!)
+                        .title(parkingName)
+                )
+
+                showMessage("Parcheggio salvato con successo")
+                alertDialog.dismiss()
+            }
+
+        } else {
+            showMessage("Inserisci un nome valido e seleziona una posizione sulla mappa")
+        }
     }
 
     private fun showMessage(message: String) {

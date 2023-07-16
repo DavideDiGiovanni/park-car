@@ -54,8 +54,7 @@ class ParkingListFragment : Fragment() {
         val btnCancel = dialog.findViewById<Button>(R.id.btnCancelParkingList)
         val txtParkingDetails = dialog.findViewById<TextView>(R.id.txtParkingDetails)
 
-        txtParkingDetails.text =
-            "Nome: ${parking.name}\nLatitudine: ${parking.latitude}\nLongitudine: ${parking.longitude}"
+        txtParkingDetails.text = "Nome: ${parking.name}\nLatitudine: ${parking.latitude}\nLongitudine: ${parking.longitude}"
 
         btnShare.setOnClickListener { shareLocation(parking) }
         btnCancel.setOnClickListener {
